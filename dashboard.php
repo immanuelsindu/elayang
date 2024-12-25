@@ -63,8 +63,8 @@ if (isset($_POST['logout'])) {
             </button>
         </form>
       </div>
-
     </div>
+    
     <div class="bg-white p-4 border mb-4">
       <h2 class="h4 fw-bold">
         Selamat Datang Administrator
@@ -84,7 +84,7 @@ if (isset($_POST['logout'])) {
         </div>
       </a>
 
-      <a href="read_disposisi.html" class="col">
+      <a href="disposisi/read_disposisi.php" class="col">
         <div class="bg-warning p-4 d-flex align-items-center rounded">
           <img alt="Disposisi Icon" class="me-2" height="50"
             src="https://e7.pngegg.com/pngimages/176/67/png-clipart-person-logo-people-travel-text-rectangle.png"
@@ -95,7 +95,7 @@ if (isset($_POST['logout'])) {
         </div>
       </a>
 
-      <a href="read_surat_edaran.html" class="col">
+      <a href="surat_edaran/read_surat_edaran.php" class="col">
         <div class="bg-warning p-4 d-flex align-items-center rounded">
           <img alt="Surat Edaran Icon" class="me-2" height="50"
             src="https://png.pngtree.com/png-vector/20220624/ourlarge/pngtree-mail-logo-fast-png-image_5360233.png"
@@ -106,7 +106,7 @@ if (isset($_POST['logout'])) {
         </div>
       </a>
 
-      <a href="download_surat.html" class="col">
+      <a href="download_surat.php" class="col">
         <div class="bg-primary p-4 d-flex align-items-center rounded">
           <img alt="Download Surat Icon" class="me-2" height="50"
             src="https://w7.pngwing.com/pngs/309/298/png-transparent-paper-letterhead-design-angle-triangle-logo.png"
@@ -117,7 +117,7 @@ if (isset($_POST['logout'])) {
         </div>
       </a>
 
-      <a href="read_surat_keluar.html" class="col-12">
+      <a href="surat_keluar/read_surat_keluar.php" class="col-12">
         <div class="bg-danger p-4 d-flex align-items-center rounded">
           <img alt="Surat Keluar Icon" class="me-2" height="50"
             src="https://bapasjaksel.com/smile/wp-content/uploads/2021/03/Surat-Keluar-1-1024x1024.png" width="50" />
