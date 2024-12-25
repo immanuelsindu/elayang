@@ -15,7 +15,6 @@ if (isset($_POST['logout'])) {
   header("Location: login.php");
   exit;
 }
-// echo "Welcome to the dashboard, " . $_SESSION['username'];
 ?>
 
 <html lang="en">

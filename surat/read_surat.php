@@ -1,4 +1,21 @@
 <?php
+session_start(); // Mulai session
+
+// Periksa apakah user sudah login
+if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+    // Jika belum login, redirect ke halaman login
+    header("Location: login.php");
+    exit;
+}
+
+// Cek jika tombol logout ditekan
+if (isset($_POST['logout'])) {
+  // Hapus session dan logout
+  session_destroy();
+  header("Location: login.php");
+  exit;
+}
+
 // Koneksi ke database
 include('../db_connection.php');
 
@@ -20,13 +37,13 @@ $result = $conn->query($sql);
 
 <body class="bg-light p-4">
   <div class="container max-w-4xl bg-white p-4 rounded-lg shadow-lg">
-    <div class="d-flex justify-content-between align-items-center">
+    <div class="d-flex justify-content-between align-items-center mb-4">
       <div class="d-flex align-items-center">
-        <img alt="School logo" class="w-10 h-auto me-3"
+        <img alt="School Logo" class="me-3" height="50"
           src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEi7rtoRw8nA-XuqtQ5Wfpyy3xMh5g-Vv4iYZozeZQ_eUHpmA4nLGHHEJ3xQbIAFNwxeVzXA0Zys5A4Tsw74dPRXD7cyQ5PayEuMZFsNj7Kgpd5tuHkUhKV_iP1JiMLgTAYAP9y3rfuUdC0/s1600/Logo+SMK.jpg"
-          width="40" />
+          width="50" />
         <div>
-          <h1 class="h4 font-weight-bold">
+          <h1 class="h4 fw-bold">
             SMK Gajah Mada 01 Margoyoso
           </h1>
           <p>
@@ -34,15 +51,27 @@ $result = $conn->query($sql);
           </p>
         </div>
       </div>
-      <div class="d-flex align-items-center">
-        <img alt="Profile picture" class="w-10 h-10 rounded-circle me-2"
-          src="https://static.vecteezy.com/system/resources/previews/000/439/863/original/vector-users-icon.jpg"
-          width="40" />
-        <span>
-          Budi Kristiono
-        </span>
+      <div class="d-flex justify-content-center align-items-center">
+          <!-- User Avatar -->
+          <img alt="User Avatar" class="rounded-circle me-2" height="50"
+              src="https://static.vecteezy.com/system/resources/previews/000/439/863/original/vector-users-icon.jpg"
+              width="50" />
+          
+          <!-- Username -->
+          <span class="me-3">
+              <?php echo $_SESSION['nama']; ?>
+          </span>
+          
+         <!-- Logout Button dengan Tooltip -->
+        <form method="POST" class="mb-0">
+            <button type="submit" name="logout" class="btn btn-danger" data-bs-toggle="tooltip" title="Logout">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
+        </form>
       </div>
-    </div>
+    </div>  
+  
+
     <div class="mt-4">
       <div class="d-flex justify-content-between align-items-center">
         <p class="h5 font-weight-bold">
