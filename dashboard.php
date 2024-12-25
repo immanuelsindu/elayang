@@ -1,3 +1,14 @@
+<?php
+session_start(); // Mulai session
+
+// Periksa apakah user sudah login
+if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+    // Jika belum login, redirect ke halaman login
+    header("Location: login.php");
+    exit;
+}
+?>
+
 <html lang="en">
 
 <head>
