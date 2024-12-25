@@ -1,5 +1,35 @@
-<html lang="en">
+<?php
+// Koneksi ke database
+$servername = "localhost"; // Ganti dengan host database Anda
+$username = "root"; // Ganti dengan username database Anda
+$password = ""; // Ganti dengan password database Anda
+$dbname = "elayang"; // Ganti dengan nama database Anda
 
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check koneksi
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Query untuk mengambil data dari tabel surat_keluar
+$sql = "SELECT * FROM surat_keluar";
+$result = $conn->query($sql);
+
+// Hapus data jika tombol hapus ditekan
+if (isset($_GET['delete_id'])) {
+    $delete_id = $_GET['delete_id'];
+    $delete_sql = "DELETE FROM surat_keluar WHERE id = $delete_id";
+    if ($conn->query($delete_sql) === TRUE) {
+        $message = "Data berhasil dihapus!";
+    } else {
+        $message = "Gagal menghapus data: " . $conn->error;
+    }
+}
+
+?>
+
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -9,7 +39,7 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
 </head>
 
-<body class="bg-warning bg-opacity-25 py-5">
+<body class=" bg-opacity-25 py-5">
   <div class="container bg-light p-4 rounded shadow-lg">
     <div class="d-flex align-items-center mb-4">
       <img alt="School logo" class="me-4" height="100"
@@ -26,7 +56,18 @@
         <span>Budi Kristiono</span>
       </div>
     </div>
-    <button class="btn btn-warning text-dark fw-bold mb-4">SURAT KELUAR</button>
+
+    <div class="mt-4 mb-3">
+      <div class="d-flex justify-content-between align-items-center">
+        <p class="h5 font-weight-bold">
+          Surat Keluar
+        </p>
+
+        <a href="add_surat_keluar.php" class="btn btn-success">
+          Tambah Surat Keluar
+        </a>
+      </div>
+    </div>
 
     <table class="table table-bordered">
       <thead class="table-light">
@@ -37,49 +78,38 @@
           <th scope="col">Perihal</th>
           <th scope="col">Kepada</th>
           <th scope="col">File Surat</th>
+          <th scope="col">Aksi</th>
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-        </tr>
-        <tr>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-        </tr>
-        <tr>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-        </tr>
-        <tr>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-        </tr>
-        <tr>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-        </tr>
+        <?php if ($result->num_rows > 0) : ?>
+          <?php while ($row = $result->fetch_assoc()) : ?>
+            <tr>
+              <td><?php echo $row['kode_surat']; ?></td>
+              <td><?php echo $row['tanggal']; ?></td>
+              <td><?php echo $row['nomor_surat']; ?></td>
+              <td><?php echo $row['perihal']; ?></td>
+              <td><?php echo $row['kepada']; ?></td>
+              <td>
+                <!-- <a href="path_to_file/<?php echo $row['upload_surat']; ?>" class="btn btn-primary btn-sm" target="_blank">
+                  Lihat Surat
+                </a> -->
+                <a href="#" class="btn btn-primary btn-sm" target="_blank">
+                  Lihat Surat
+                </a>
+
+              </td>
+              <td>
+                <a href="edit_surat_keluar.php?id=<?php echo $row['id']; ?>" class="btn btn-warning btn-sm">Edit</a>
+                <a href="delete_surat_keluar.php?id=<?php echo $row['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Apakah Anda yakin ingin menghapus data ini?')">Hapus</a>
+              </td>
+            </tr>
+          <?php endwhile; ?>
+        <?php else : ?>
+          <tr>
+            <td colspan="7" class="text-center">Tidak ada data surat keluar.</td>
+          </tr>
+        <?php endif; ?>
       </tbody>
     </table>
   </div>
@@ -90,3 +120,8 @@
 </body>
 
 </html>
+
+<?php
+// Tutup koneksi
+$conn->close();
+?>

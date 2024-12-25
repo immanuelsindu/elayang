@@ -12,6 +12,24 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
+// Ambil id dari URL
+if (isset($_GET['id'])) {
+    $id = $_GET['id'];
+
+    // Query untuk mengambil data surat keluar berdasarkan id
+    $sql = "SELECT * FROM surat_keluar WHERE id = $id";
+    $result = $conn->query($sql);
+
+    if ($result->num_rows > 0) {
+        // Ambil data surat keluar
+        $row = $result->fetch_assoc();
+    } else {
+        // Jika data tidak ditemukan, redirect ke halaman daftar surat keluar
+        header("Location: read_surat_keluar.php");
+        exit();
+    }
+}
+
 // Proses form jika tombol submit ditekan
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Ambil data dari form
@@ -21,31 +39,31 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $perihal = $_POST['perihal'];
     $kepada = $_POST['kepada'];
 
-    // Proses upload file
-    if (isset($_FILES['upload_surat'])) {
+    // Proses upload file jika ada
+    if (isset($_FILES['upload_surat']) && $_FILES['upload_surat']['error'] == 0) {
         $upload_surat = file_get_contents($_FILES['upload_surat']['tmp_name']);
+        $sql = "UPDATE surat_keluar SET kode_surat = ?, tanggal = ?, nomor_surat = ?, perihal = ?, kepada = ?, upload_surat = ? WHERE id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("ssssssi", $kode_surat, $tanggal, $nomor_surat, $perihal, $kepada, $upload_surat, $id);
+    } else {
+        $sql = "UPDATE surat_keluar SET kode_surat = ?, tanggal = ?, nomor_surat = ?, perihal = ?, kepada = ? WHERE id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("sssssi", $kode_surat, $tanggal, $nomor_surat, $perihal, $kepada, $id);
     }
 
-    // Query untuk memasukkan data ke tabel surat_keluar
-    $sql = "INSERT INTO surat_keluar (kode_surat, tanggal, nomor_surat, perihal, kepada, upload_surat) 
-            VALUES ('$kode_surat', '$tanggal', '$nomor_surat', '$perihal', '$kepada', ?)";
-    
-    // Persiapkan statement
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("b", $upload_surat); // bind_param dengan tipe data b (blob)
-    
     // Eksekusi query
-   // Eksekusi query
-   if ($stmt->execute()) {
-        $message = "Data berhasil disimpan."; // Pesan sukses
+    if ($stmt->execute()) {
+        $message = "Data berhasil diubah!";
+        header("Location: read_surat_keluar.php");
     } else {
-        $message = "Error: " . $stmt->error; // Pesan error
+        $message = "Gagal mengubah data: " . $stmt->error;
     }
-    
+
     // Tutup statement
     $stmt->close();
 }
 
+// Tutup koneksi
 $conn->close();
 ?>
 
@@ -62,12 +80,6 @@ $conn->close();
       background-color: #f5e0c3;
     }
   </style>
-  <script>
-        // Menampilkan alert jika ada pesan dari PHP
-        <?php if ($message != ''): ?>
-            alert('<?php echo $message; ?>');
-        <?php endif; ?>
-    </script>
 </head>
 
 <body class="d-flex justify-content-center align-items-center min-vh-100">
@@ -94,7 +106,7 @@ $conn->close();
     </div>
 
     <div class="mb-4">
-        <p class="h6 fw-bold">Tambah Surat Keluar</p>
+        <p class="h6 fw-bold">Edit Surat Keluar</p>
     </div>
 
     <!-- Form Inputan -->
@@ -102,27 +114,27 @@ $conn->close();
         <div class="row mb-4">
             <div class="col-md-6 mb-3">
                 <label for="kode-surat">Kode Surat</label>
-                <input type="text" class="form-control" id="kode-surat" name="kode_surat"  placeholder="Masukkan Kode Surat" required />
+                <input type="text" class="form-control" id="kode-surat" name="kode_surat" value="<?php echo $row['kode_surat']; ?>" placeholder="Masukkan Kode Surat" required />
             </div>
             <div class="col-md-6 mb-3">
                 <label for="tanggal-surat">Tanggal Surat</label>
-                <input type="date" class="form-control" id="tanggal-surat" name="tanggal" placeholder="Pilih Tanggal Surat" required />
+                <input type="date" class="form-control" id="tanggal-surat" name="tanggal" value="<?php echo $row['tanggal']; ?>" placeholder="Pilih Tanggal Surat" required />
             </div>
             <div class="col-md-6 mb-3">
                 <label for="nomor-surat">Nomor Surat</label>
-                <input type="text" class="form-control" id="nomor-surat" name="nomor_surat" placeholder="Masukkan Nomor Surat" required />
+                <input type="text" class="form-control" id="nomor-surat" name="nomor_surat" value="<?php echo $row['nomor_surat']; ?>" placeholder="Masukkan Nomor Surat" required />
             </div>
             <div class="col-md-6 mb-3">
                 <label for="perihal">Perihal</label>
-                <input type="text" class="form-control" id="perihal" name="perihal" placeholder="Masukkan Perihal Surat" required />
+                <input type="text" class="form-control" id="perihal" name="perihal" value="<?php echo $row['perihal']; ?>" placeholder="Masukkan Perihal Surat" required />
             </div>
             <div class="col-md-6 mb-3">
                 <label for="kepada">Kepada</label>
-                <input type="text" class="form-control" id="kepada" name="kepada" placeholder="Masukkan Nama Penerima Surat" required />
+                <input type="text" class="form-control" id="kepada" name="kepada" value="<?php echo $row['kepada']; ?>" placeholder="Masukkan Nama Penerima Surat" required />
             </div>
             <div class="col-md-6 mb-3">
-                <label for="upload-pdf">Upload PDF</label>
-                <input type="file" class="form-control" id="upload-pdf" name="upload_surat" required />
+                <label for="upload-pdf">Upload PDF (Opsional)</label>
+                <input type="file" class="form-control" id="upload-pdf" name="upload_surat" />
             </div>
         </div>
 
