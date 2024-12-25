@@ -3,9 +3,33 @@
 session_start();
 include('../db_connection.php');
 
-// Memproses form jika tombol submit ditekan
+// Memastikan ID Surat Edaran ada di URL
+if (isset($_GET['id'])) {
+    // Mengambil ID dari parameter URL
+    $id = $_GET['id'];
+
+    // Mengambil data surat edaran yang akan diedit
+    $sql = "SELECT * FROM surat_edaran WHERE id = ?";
+    if ($stmt = $conn->prepare($sql)) {
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        // Jika data ditemukan, masukkan ke variabel
+        if ($result->num_rows > 0) {
+            $data = $result->fetch_assoc();
+        } else {
+            $_SESSION['message'] = "Data tidak ditemukan.";
+            $_SESSION['msg_type'] = "danger";
+            header("Location: read_surat_edaran.php");
+            exit();
+        }
+    }
+}
+
+// Menangani form submit untuk edit data
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Mengambil nilai input dari form
+    // Mengambil data dari form
     $kode_surat = $_POST['kode_surat'];
     $tanggal = $_POST['tanggal'];
     $nomor_surat = $_POST['nomor_surat'];
@@ -13,38 +37,43 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $kepada = $_POST['kepada'];
     $upload_surat = $_FILES['upload_surat']['tmp_name'];
 
-    // Mengambil file PDF yang diupload
-    if (is_uploaded_file($upload_surat)) {
-        $upload_surat_blob = file_get_contents($upload_surat);
-    } else {
-        $upload_surat_blob = null; // Menangani jika tidak ada file yang diupload
+    // Menyiapkan query untuk update data surat edaran
+    $sql_update = "UPDATE surat_edaran SET kode_surat = ?, tanggal = ?, nomor_surat = ?, perihal = ?, kepada = ?";
+
+    // Jika file PDF diupload, maka lakukan update untuk file
+    if (!empty($upload_surat)) {
+        // Membaca file dan menyimpannya dalam variabel
+        $upload_data = file_get_contents($upload_surat);
+        $sql_update .= ", upload_surat = ?";
     }
 
-    // Query untuk memasukkan data ke tabel surat_edaran
-    $sql = "INSERT INTO surat_edaran (kode_surat, tanggal, nomor_surat, perihal, kepada, upload_surat)
-            VALUES (?, ?, ?, ?, ?, ?)";
+    // Menambahkan bagian query untuk pembaruan data surat edaran
+    $sql_update .= " WHERE id = ?";
+    
+    if ($stmt_update = $conn->prepare($sql_update)) {
+        if (!empty($upload_surat)) {
+            $stmt_update->bind_param("ssssssi", $kode_surat, $tanggal, $nomor_surat, $perihal, $kepada, $upload_data, $id);
+        } else {
+            $stmt_update->bind_param("sssssi", $kode_surat, $tanggal, $nomor_surat, $perihal, $kepada, $id);
+        }
 
-    // Menyiapkan statement untuk query
-    if ($stmt = $conn->prepare($sql)) {
-        $stmt->bind_param("sssssb", $kode_surat, $tanggal, $nomor_surat, $perihal, $kepada, $upload_surat_blob);
-
-        // Mengeksekusi statement
-         // Eksekusi query
-         if ($stmt->execute()) {
-              $message = "Data berhasil disimpan."; // Pesan sukses
-          } else {
-              $message = "Error: " . $stmt->error; // Pesan error
-          }
-
-        // Menutup statement
-        $stmt->close();
+        // Menjalankan query update
+        if ($stmt_update->execute()) {
+            $_SESSION['message'] = "Data surat edaran berhasil diperbarui.";
+            $_SESSION['msg_type'] = "success";
+            header("Location: read_surat_edaran.php");
+        } else {
+            $_SESSION['message'] = "Gagal memperbarui data surat edaran.";
+            $_SESSION['msg_type'] = "danger";
+        }
     }
-
-    // Menutup koneksi
-    $conn->close();
 }
+
+// Menutup koneksi database
+$conn->close();
 ?>
 
+<!-- HTML Form Edit Surat Edaran -->
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -53,12 +82,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
-    <script>
-        // Menampilkan alert jika ada pesan dari PHP
-        <?php if ($message != ''): ?>
-            alert('<?php echo $message; ?>');
-        <?php endif; ?>
-    </script>
 </head>
 <body class="d-flex justify-content-center align-items-center min-vh-100">
     <div class="p-4 rounded-lg shadow-lg w-100" style="max-width: 900px;">
@@ -79,7 +102,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         </div>
 
         <div class="mb-4">
-            <p class="h6 fw-bold">Tambah Surat Edaran</p>
+            <p class="h6 fw-bold">Edit Surat Edaran</p>
         </div>
 
         <!-- Form Inputan -->
@@ -87,42 +110,43 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <div class="form-group row">
                 <label for="kodeSurat" class="col-sm-3 col-form-label">Kode Surat</label>
                 <div class="col-sm-9">
-                    <input type="text" class="form-control" id="kodeSurat" name="kode_surat" placeholder="Masukkan Kode Surat" required />
+                    <input type="text" class="form-control" id="kodeSurat" name="kode_surat" value="<?= $data['kode_surat']; ?>" required />
                 </div>
             </div>
             <div class="form-group row">
                 <label for="tanggalSurat" class="col-sm-3 col-form-label">Tanggal Surat</label>
                 <div class="col-sm-9">
-                    <input type="date" class="form-control" id="tanggalSurat" name="tanggal" placeholder="Pilih Tanggal Surat" required />
+                    <input type="date" class="form-control" id="tanggalSurat" name="tanggal" value="<?= $data['tanggal']; ?>" required />
                 </div>
             </div>
             <div class="form-group row">
                 <label for="nomorSurat" class="col-sm-3 col-form-label">Nomor Surat</label>
                 <div class="col-sm-9">
-                    <input type="text" class="form-control" id="nomorSurat" name="nomor_surat" placeholder="Masukkan Nomor Surat" required />
+                    <input type="text" class="form-control" id="nomorSurat" name="nomor_surat" value="<?= $data['nomor_surat']; ?>" required />
                 </div>
             </div>
             <div class="form-group row">
                 <label for="perihal" class="col-sm-3 col-form-label">Perihal</label>
                 <div class="col-sm-9">
-                    <input type="text" class="form-control" id="perihal" name="perihal" placeholder="Masukkan Perihal Surat" required />
+                    <input type="text" class="form-control" id="perihal" name="perihal" value="<?= $data['perihal']; ?>" required />
                 </div>
             </div>
             <div class="form-group row">
                 <label for="kepada" class="col-sm-3 col-form-label">Kepada</label>
                 <div class="col-sm-9">
-                    <input type="text" class="form-control" id="kepada" name="kepada" placeholder="Masukkan Nama Penerima Surat" required />
+                    <input type="text" class="form-control" id="kepada" name="kepada" value="<?= $data['kepada']; ?>" required />
                 </div>
             </div>
             <div class="form-group row">
                 <label for="uploadPdf" class="col-sm-3 col-form-label">Upload PDF</label>
                 <div class="col-sm-9">
-                    <input type="file" class="form-control" id="uploadPdf" name="upload_surat" placeholder="Pilih File PDF" required />
+                    <input type="file" class="form-control" id="uploadPdf" name="upload_surat" />
+                    <small class="form-text text-muted">Kosongkan jika tidak ingin mengubah file PDF.</small>
                 </div>
             </div>
 
             <div class="d-flex justify-content-between">
-                <a href="read_disposisi.php" class="btn btn-danger">Batal</a>
+                <a href="read_surat_edaran.php" class="btn btn-danger">Batal</a>
                 <button type="submit" class="btn btn-success">Simpan</button>
             </div>
         </form>

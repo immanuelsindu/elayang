@@ -27,10 +27,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // Eksekusi query
         if ($stmt->execute()) {
-          $message = "Data berhasil disimpan."; // Pesan sukses
-      } else {
-          $message = "Error: " . $stmt->error; // Pesan error
-      }
+            $message = "Data berhasil disimpan."; // Pesan sukses
+        } else {
+            $message = "Error: " . $stmt->error; // Pesan error
+        }
   
 
         $stmt->close();
