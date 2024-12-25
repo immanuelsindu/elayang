@@ -7,6 +7,15 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     header("Location: login.php");
     exit;
 }
+
+// Cek jika tombol logout ditekan
+if (isset($_POST['logout'])) {
+  // Hapus session dan logout
+  session_destroy();
+  header("Location: login.php");
+  exit;
+}
+// echo "Welcome to the dashboard, " . $_SESSION['username'];
 ?>
 
 <html lang="en">
@@ -36,14 +45,25 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
           </p>
         </div>
       </div>
-      <div class="d-flex align-items-center">
-        <img alt="User Avatar" class="rounded-circle me-2" height="50"
-          src="https://static.vecteezy.com/system/resources/previews/000/439/863/original/vector-users-icon.jpg"
-          width="50" />
-        <span>
-          Budi Kristiono
-        </span>
+      <div class="d-flex justify-content-center align-items-center">
+          <!-- User Avatar -->
+          <img alt="User Avatar" class="rounded-circle me-2" height="50"
+              src="https://static.vecteezy.com/system/resources/previews/000/439/863/original/vector-users-icon.jpg"
+              width="50" />
+          
+          <!-- Username -->
+          <span class="me-3">
+              <?php echo $_SESSION['nama']; ?>
+          </span>
+          
+         <!-- Logout Button dengan Tooltip -->
+        <form method="POST" class="mb-0">
+            <button type="submit" name="logout" class="btn btn-danger" data-bs-toggle="tooltip" title="Logout">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
+        </form>
       </div>
+
     </div>
     <div class="bg-white p-4 border mb-4">
       <h2 class="h4 fw-bold">
