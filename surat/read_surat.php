@@ -1,3 +1,12 @@
+<?php
+// Koneksi ke database
+include('../db_connection.php');
+
+// Query untuk mengambil semua data surat masuk
+$sql = "SELECT * FROM surat_masuk";
+$result = $conn->query($sql);
+?>
+
 <html lang="en">
 
 <head>
@@ -13,9 +22,9 @@
   <div class="container max-w-4xl bg-white p-4 rounded-lg shadow-lg">
     <div class="d-flex justify-content-between align-items-center">
       <div class="d-flex align-items-center">
-        <img alt="School logo" class="w-25 h-auto me-3"
+        <img alt="School logo" class="w-10 h-auto me-3"
           src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEi7rtoRw8nA-XuqtQ5Wfpyy3xMh5g-Vv4iYZozeZQ_eUHpmA4nLGHHEJ3xQbIAFNwxeVzXA0Zys5A4Tsw74dPRXD7cyQ5PayEuMZFsNj7Kgpd5tuHkUhKV_iP1JiMLgTAYAP9y3rfuUdC0/s1600/Logo+SMK.jpg"
-          width="80" />
+          width="40" />
         <div>
           <h1 class="h4 font-weight-bold">
             SMK Gajah Mada 01 Margoyoso
@@ -40,7 +49,7 @@
           Surat Masuk
         </p>
 
-        <a href="add_surat.html" class="btn btn-success">
+        <a href="add_surat.php" class="btn btn-success">
           Tambah Surat
         </a>
       </div>
@@ -55,49 +64,36 @@
             <th>Asal Surat</th>
             <th>Perihal</th>
             <th>File Surat</th>
+            <th>Aksi</th> <!-- Kolom baru untuk aksi Edit dan Hapus -->
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
+            <?php
+            // Cek apakah ada data dari hasil query
+            if ($result->num_rows > 0) {
+                // Loop melalui data yang diambil dari database dan tampilkan
+                while ($row = $result->fetch_assoc()) {
+                    // Convert tanggal menjadi format yang mudah dibaca
+                    $tanggalSurat = date('d-m-Y', strtotime($row['tanggal_surat']));
+                    echo "<tr>
+                            <td>{$row['kode_surat']}</td>
+                            <td>{$tanggalSurat}</td>
+                            <td>{$row['nomor_surat']}</td>
+                            <td>{$row['asal_surat']}</td>
+                            <td>{$row['perihal']}</td>
+                            <td><a href='view_pdf.php?id={$row['id']}' class='btn btn-primary btn-sm'>Lihat Surat</a></td>
+                            <td>
+                              <!-- Tombol Edit -->
+                              <a href='edit_surat.php?id={$row['id']}' class='btn btn-warning btn-sm'>Edit</a>
+                              <!-- Tombol Hapus -->
+                              <a href='delete_surat.php?id={$row['id']}' class='btn btn-danger btn-sm' onclick='return confirm(\"Anda yakin ingin menghapus surat ini?\")'>Hapus</a>
+                            </td>
+                          </tr>";
+                }
+            } else {
+                echo "<tr><td colspan='7' class='text-center'>Tidak ada data surat masuk.</td></tr>";
+            }
+            ?>
         </tbody>
       </table>
     </div>

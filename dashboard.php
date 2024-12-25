@@ -43,7 +43,7 @@
       </p>
     </div>
     <div class="row row-cols-2 g-4 bg-success p-4">
-      <a href="read_surat.html" class="col">
+      <a href="surat/read_surat.php" class="col">
         <div class="bg-primary p-4 d-flex align-items-center rounded">
           <img alt="Surat Masuk Icon" class="me-2" height="50"
             src="https://tse3.mm.bing.net/th?id=OIP.YU1vRLM2Q90Yfl32SN7kDQHaHa&pid=Api&P=0&h=180" width="50" />
