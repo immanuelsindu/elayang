@@ -1,20 +1,10 @@
 <?php
-
 session_start(); // Mulai session
 
 // Periksa apakah user sudah login
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
-    // Jika belum login, redirect ke halaman login
     header("Location: login.php");
     exit;
-}
-
-// Cek jika tombol logout ditekan
-if (isset($_POST['logout'])) {
-  // Hapus session dan logout
-  session_destroy();
-  header("Location: login.php");
-  exit;
 }
 
 // Koneksi ke database
@@ -25,7 +15,6 @@ $message = '';
 
 // Cek apakah parameter 'id' ada di URL
 if (isset($_GET['id'])) {
-    // Ambil ID surat dari URL
     $id = $_GET['id'];
 
     // Query untuk mengambil data surat berdasarkan ID
@@ -34,16 +23,17 @@ if (isset($_GET['id'])) {
         $stmt->bind_param("i", $id);
         $stmt->execute();
         $result = $stmt->get_result();
-        
+
         // Jika data ditemukan
         if ($result->num_rows > 0) {
-            // Ambil data surat
             $row = $result->fetch_assoc();
         } else {
             echo "<script>alert('Data tidak ditemukan.'); window.location.href='read_surat.php';</script>";
+            exit;
         }
     } else {
         echo "<script>alert('Terjadi kesalahan pada server.'); window.location.href='read_surat.php';</script>";
+        exit;
     }
 
     // Proses ketika form disubmit (POST)
@@ -54,28 +44,39 @@ if (isset($_GET['id'])) {
         $nomorSurat = $_POST['nomorSurat'];
         $asalSurat = $_POST['asalSurat'];
         $perihal = $_POST['perihal'];
-        $uploadSurat = $_FILES['uploadSurat'];
 
-        // Menangani upload file PDF jika ada
-        $filePath = null;
-        if ($uploadSurat['error'] == 0) {
-            $uploadDir = 'uploads/'; // Sesuaikan dengan direktori upload
-            $fileName = time() . "_" . basename($uploadSurat['name']);
-            $filePath = $uploadDir . $fileName;
-            move_uploaded_file($uploadSurat['tmp_name'], $filePath);
-        } else {
-            // Jika tidak ada file yang diupload, biarkan filePath tetap null
-            $filePath = $row['file_path']; // Tetap menggunakan file yang lama
+        // Menangani upload file baru
+        $filePath = $row['upload_surat']; // File path lama
+        if (isset($_FILES['uploadSurat']) && $_FILES['uploadSurat']['error'] === UPLOAD_ERR_OK) {
+            $uploadDir = 'uploads/'; // Folder tempat menyimpan file
+            $fileName = time() . "_" . basename($_FILES['uploadSurat']['name']);
+            $newFilePath = $uploadDir . $fileName;
+
+            // Validasi file
+            $fileType = mime_content_type($_FILES['uploadSurat']['tmp_name']);
+            $fileSize = $_FILES['uploadSurat']['size'];
+
+            if ($fileType === 'application/pdf' && $fileSize <= 2 * 1024 * 1024) { // Maksimal 2 MB
+                // Hapus file lama jika ada
+                if (file_exists($filePath)) {
+                    unlink($filePath);
+                }
+                // Pindahkan file baru
+                move_uploaded_file($_FILES['uploadSurat']['tmp_name'], $newFilePath);
+                $filePath = $newFilePath;
+            } else {
+                $message = "File harus berupa PDF dengan ukuran maksimal 2 MB.";
+            }
         }
 
-        // Query untuk memperbarui data surat
+        // Update database
         $updateSql = "UPDATE surat_masuk SET kode_surat = ?, tanggal_surat = ?, nomor_surat = ?, asal_surat = ?, perihal = ?, upload_surat = ? WHERE id = ?";
-        
         if ($updateStmt = $conn->prepare($updateSql)) {
             $updateStmt->bind_param("ssssssi", $kodeSurat, $tanggalSurat, $nomorSurat, $asalSurat, $perihal, $filePath, $id);
             if ($updateStmt->execute()) {
                 $message = "Data surat berhasil diperbarui.";
                 echo "<script>alert('$message'); window.location.href='read_surat.php';</script>";
+                exit;
             } else {
                 $message = "Terjadi kesalahan saat menyimpan perubahan.";
             }
@@ -85,10 +86,12 @@ if (isset($_GET['id'])) {
     }
 } else {
     echo "<script>alert('ID surat tidak ditemukan.'); window.location.href='read_surat.php';</script>";
+    exit;
 }
 
 $conn->close();
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -195,6 +198,7 @@ $conn->close();
             <label for="uploadSurat" class="col-sm-3 col-form-label">Upload PDF</label>
             <div class="col-sm-9">
                 <input type="file" class="form-control" id="uploadSurat" name="uploadSurat" accept="application/pdf" />
+                <small class="text-muted">Hanya file PDF dengan ukuran maksimal 2 MB.</small>
             </div>
         </div>
         <div class="d-flex justify-content-between">
