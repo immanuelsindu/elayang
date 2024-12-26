@@ -46,21 +46,24 @@ if (isset($_GET['delete_id'])) {
 </head>
 
 <body class=" bg-opacity-25 py-5">
-  <div class="container bg-light p-4 rounded shadow-lg">
+  <div class="container max-w-4xl bg-white p-4 rounded-lg shadow-lg bg-light p-4 rounded shadow-lg">
   <div class="d-flex justify-content-between align-items-center mb-4">
+  <a href="../dashboard.php" class="text-decoration-none text-dark">
       <div class="d-flex align-items-center">
-        <img alt="School Logo" class="me-3" height="50"
-          src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEi7rtoRw8nA-XuqtQ5Wfpyy3xMh5g-Vv4iYZozeZQ_eUHpmA4nLGHHEJ3xQbIAFNwxeVzXA0Zys5A4Tsw74dPRXD7cyQ5PayEuMZFsNj7Kgpd5tuHkUhKV_iP1JiMLgTAYAP9y3rfuUdC0/s1600/Logo+SMK.jpg"
-          width="50" />
-        <div>
+          <img alt="School Logo" class="me-3" height="50"
+            src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEi7rtoRw8nA-XuqtQ5Wfpyy3xMh5g-Vv4iYZozeZQ_eUHpmA4nLGHHEJ3xQbIAFNwxeVzXA0Zys5A4Tsw74dPRXD7cyQ5PayEuMZFsNj7Kgpd5tuHkUhKV_iP1JiMLgTAYAP9y3rfuUdC0/s1600/Logo+SMK.jpg"
+            width="50" />
+          <div>
           <h1 class="h4 fw-bold">
-            SMK Gajah Mada 01 Margoyoso
-          </h1>
-          <p>
-            Jalan Pasar Bulumanis Margoyoso Pati, Kode Pos 59154
-          </p>
+                SMK Gajah Mada 01 Margoyoso
+              </h1>
+              <p>
+                Jalan Pasar Bulumanis Margoyoso Pati, Kode Pos 59154
+              </p>
+            
+          </div>
         </div>
-      </div>
+      </a>
       <div class="d-flex justify-content-center align-items-center">
           <!-- User Avatar -->
           <img alt="User Avatar" class="rounded-circle me-2" height="50"
