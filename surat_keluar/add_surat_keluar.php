@@ -18,6 +18,8 @@ if (isset($_POST['logout'])) {
 
 include('../db_connection.php');
 
+$message = ""; // Inisialisasi pesan
+
 // Proses form jika tombol submit ditekan
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Ambil data dari form
@@ -27,29 +29,45 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $perihal = $_POST['perihal'];
     $kepada = $_POST['kepada'];
 
-    // Proses upload file
-    if (isset($_FILES['upload_surat'])) {
-        $upload_surat = file_get_contents($_FILES['upload_surat']['tmp_name']);
-    }
+    // Proses upload file PDF
+    if (isset($_FILES['upload_surat']) && $_FILES['upload_surat']['error'] == UPLOAD_ERR_OK) {
+        $upload_surat = $_FILES['upload_surat'];
 
-    // Query untuk memasukkan data ke tabel surat_keluar
-    $sql = "INSERT INTO surat_keluar (kode_surat, tanggal, nomor_surat, perihal, kepada, upload_surat) 
-            VALUES ('$kode_surat', '$tanggal', '$nomor_surat', '$perihal', '$kepada', ?)";
-    
-    // Persiapkan statement
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("b", $upload_surat); // bind_param dengan tipe data b (blob)
-    
-    // Eksekusi query
-   // Eksekusi query
-   if ($stmt->execute()) {
-        $message = "Data berhasil disimpan."; // Pesan sukses
-    } else {
-        $message = "Error: " . $stmt->error; // Pesan error
+        // Validasi tipe file PDF
+        $file_type = strtolower(pathinfo($upload_surat['name'], PATHINFO_EXTENSION));
+        if ($file_type != "pdf") {
+            $message = "Hanya file PDF yang diperbolehkan.";
+        } elseif ($upload_surat['size'] > 5000000) { // Maksimal ukuran file 5MB
+            $message = "File terlalu besar.";
+        } else {
+            // Tentukan nama file dan lokasi tujuan penyimpanan
+            $target_dir = "../uploads/";
+            $target_file = $target_dir . basename($upload_surat['name']);
+
+            // Pindahkan file ke folder upload
+            if (move_uploaded_file($upload_surat['tmp_name'], $target_file)) {
+                // Query untuk memasukkan data ke tabel surat_keluar
+                $sql = "INSERT INTO surat_keluar (kode_surat, tanggal, nomor_surat, perihal, kepada, upload_surat) 
+                        VALUES ('$kode_surat', '$tanggal', '$nomor_surat', '$perihal', '$kepada', ?)";
+                
+                // Persiapkan statement
+                $stmt = $conn->prepare($sql);
+                $stmt->bind_param("s", $target_file); // Menyimpan path file sebagai string
+
+                // Eksekusi query
+                if ($stmt->execute()) {
+                    $message = "Data berhasil disimpan."; // Pesan sukses
+                } else {
+                    $message = "Error: " . $stmt->error; // Pesan error
+                }
+
+                // Tutup statement
+                $stmt->close();
+            } else {
+                $message = "Terjadi kesalahan saat mengunggah file.";
+            }
+        }
     }
-    
-    // Tutup statement
-    $stmt->close();
 }
 
 $conn->close();

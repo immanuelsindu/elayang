@@ -105,7 +105,7 @@ if (isset($_POST['logout'])) {
         </div>
       </a>
 
-      <a href="download_surat.php" class="col">
+      <!-- <a href="download_surat.php" class="col">
         <div class="bg-primary p-4 d-flex align-items-center rounded">
           <img alt="Download Surat Icon" class="me-2" height="50"
             src="https://w7.pngwing.com/pngs/309/298/png-transparent-paper-letterhead-design-angle-triangle-logo.png"
@@ -114,9 +114,9 @@ if (isset($_POST['logout'])) {
             DOWNLOAD SURAT
           </span>
         </div>
-      </a>
+      </a> -->
 
-      <a href="surat_keluar/read_surat_keluar.php" class="col-12">
+      <a href="surat_keluar/read_surat_keluar.php" class="col-6">
         <div class="bg-danger p-4 d-flex align-items-center rounded">
           <img alt="Surat Keluar Icon" class="me-2" height="50"
             src="https://bapasjaksel.com/smile/wp-content/uploads/2021/03/Surat-Keluar-1-1024x1024.png" width="50" />

@@ -114,15 +114,7 @@ if (isset($_GET['delete_id'])) {
               <td><?php echo $row['nomor_surat']; ?></td>
               <td><?php echo $row['perihal']; ?></td>
               <td><?php echo $row['kepada']; ?></td>
-              <td>
-                <!-- <a href="path_to_file/<?php echo $row['upload_surat']; ?>" class="btn btn-primary btn-sm" target="_blank">
-                  Lihat Surat
-                </a> -->
-                <a href="#" class="btn btn-primary btn-sm" target="_blank">
-                  Lihat Surat
-                </a>
-
-              </td>
+              <td><a href='view_pdf.php?id=<?php echo $row['id']; ?>' class='btn btn-primary btn-sm'>Lihat Surat</a></td>
               <td>
                 <a href="edit_surat_keluar.php?id=<?php echo $row['id']; ?>" class="btn btn-warning btn-sm">Edit</a>
                 <a href="delete_surat_keluar.php?id=<?php echo $row['id']; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Apakah Anda yakin ingin menghapus data ini?')">Hapus</a>

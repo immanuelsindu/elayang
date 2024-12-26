@@ -23,8 +23,11 @@ if (isset($_GET['id'])) {
     $id = $_GET['id'];
 
     // Query untuk mengambil data surat keluar berdasarkan id
-    $sql = "SELECT * FROM surat_keluar WHERE id = $id";
-    $result = $conn->query($sql);
+    $sql = "SELECT * FROM surat_keluar WHERE id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
     if ($result->num_rows > 0) {
         // Ambil data surat keluar
@@ -47,11 +50,30 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     // Proses upload file jika ada
     if (isset($_FILES['upload_surat']) && $_FILES['upload_surat']['error'] == 0) {
-        $upload_surat = file_get_contents($_FILES['upload_surat']['tmp_name']);
-        $sql = "UPDATE surat_keluar SET kode_surat = ?, tanggal = ?, nomor_surat = ?, perihal = ?, kepada = ?, upload_surat = ? WHERE id = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ssssssi", $kode_surat, $tanggal, $nomor_surat, $perihal, $kepada, $upload_surat, $id);
+        // Validasi file
+        $upload_surat = $_FILES['upload_surat'];
+        $file_type = strtolower(pathinfo($upload_surat['name'], PATHINFO_EXTENSION));
+        if ($file_type != "pdf") {
+            $message = "Hanya file PDF yang diperbolehkan.";
+        } elseif ($upload_surat['size'] > 5000000) { // Maksimal ukuran file 5MB
+            $message = "File terlalu besar.";
+        } else {
+            // Tentukan nama file dan lokasi tujuan penyimpanan
+            $target_dir = "../uploads/";
+            $target_file = $target_dir . basename($upload_surat['name']);
+
+            // Pindahkan file ke folder upload
+            if (move_uploaded_file($upload_surat['tmp_name'], $target_file)) {
+                // Jika berhasil mengupload file baru, update database
+                $sql = "UPDATE surat_keluar SET kode_surat = ?, tanggal = ?, nomor_surat = ?, perihal = ?, kepada = ?, upload_surat = ? WHERE id = ?";
+                $stmt = $conn->prepare($sql);
+                $stmt->bind_param("ssssssi", $kode_surat, $tanggal, $nomor_surat, $perihal, $kepada, $target_file, $id);
+            } else {
+                $message = "Terjadi kesalahan saat mengunggah file.";
+            }
+        }
     } else {
+        // Jika tidak ada file yang diunggah, gunakan file yang lama
         $sql = "UPDATE surat_keluar SET kode_surat = ?, tanggal = ?, nomor_surat = ?, perihal = ?, kepada = ? WHERE id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("sssssi", $kode_surat, $tanggal, $nomor_surat, $perihal, $kepada, $id);
@@ -78,7 +100,6 @@ $conn->close();
 <meta charset="utf-8" />
   <meta content="width=device-width, initial-scale=1.0" name="viewport" />
   <title>Admin Dashboard</title>
-  <!-- Add Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
   <style>
@@ -105,17 +126,10 @@ $conn->close();
         </div>
       </div>
       <div class="d-flex justify-content-center align-items-center">
-          <!-- User Avatar -->
           <img alt="User Avatar" class="rounded-circle me-2" height="50"
               src="https://static.vecteezy.com/system/resources/previews/000/439/863/original/vector-users-icon.jpg"
               width="50" />
-          
-          <!-- Username -->
-          <span class="me-3">
-              <?php echo $_SESSION['nama']; ?>
-          </span>
-          
-         <!-- Logout Button dengan Tooltip -->
+          <span class="me-3"><?php echo $_SESSION['nama']; ?></span>
         <form method="POST" class="mb-0">
             <button type="submit" name="logout" class="btn btn-danger" data-bs-toggle="tooltip" title="Logout">
                 <i class="fas fa-sign-out-alt"></i>
@@ -132,32 +146,34 @@ $conn->close();
         <p class="h6 fw-bold">Edit Surat Keluar</p>
     </div>
 
-    <!-- Form Inputan -->
     <form action="" method="POST" enctype="multipart/form-data">
         <div class="row mb-4">
             <div class="col-md-6 mb-3">
                 <label for="kode-surat">Kode Surat</label>
-                <input type="text" class="form-control" id="kode-surat" name="kode_surat" value="<?php echo $row['kode_surat']; ?>" placeholder="Masukkan Kode Surat" required />
+                <input type="text" class="form-control" id="kode-surat" name="kode_surat" value="<?php echo $row['kode_surat']; ?>" required />
             </div>
             <div class="col-md-6 mb-3">
                 <label for="tanggal-surat">Tanggal Surat</label>
-                <input type="date" class="form-control" id="tanggal-surat" name="tanggal" value="<?php echo $row['tanggal']; ?>" placeholder="Pilih Tanggal Surat" required />
+                <input type="date" class="form-control" id="tanggal-surat" name="tanggal" value="<?php echo $row['tanggal']; ?>" required />
             </div>
             <div class="col-md-6 mb-3">
                 <label for="nomor-surat">Nomor Surat</label>
-                <input type="text" class="form-control" id="nomor-surat" name="nomor_surat" value="<?php echo $row['nomor_surat']; ?>" placeholder="Masukkan Nomor Surat" required />
+                <input type="text" class="form-control" id="nomor-surat" name="nomor_surat" value="<?php echo $row['nomor_surat']; ?>" required />
             </div>
             <div class="col-md-6 mb-3">
                 <label for="perihal">Perihal</label>
-                <input type="text" class="form-control" id="perihal" name="perihal" value="<?php echo $row['perihal']; ?>" placeholder="Masukkan Perihal Surat" required />
+                <input type="text" class="form-control" id="perihal" name="perihal" value="<?php echo $row['perihal']; ?>" required />
             </div>
             <div class="col-md-6 mb-3">
                 <label for="kepada">Kepada</label>
-                <input type="text" class="form-control" id="kepada" name="kepada" value="<?php echo $row['kepada']; ?>" placeholder="Masukkan Nama Penerima Surat" required />
+                <input type="text" class="form-control" id="kepada" name="kepada" value="<?php echo $row['kepada']; ?>" required />
             </div>
             <div class="col-md-6 mb-3">
                 <label for="upload-pdf">Upload PDF (Opsional)</label>
                 <input type="file" class="form-control" id="upload-pdf" name="upload_surat" />
+                <?php if ($row['upload_surat']): ?>
+                    <p><a href="<?php echo $row['upload_surat']; ?>" target="_blank">Lihat PDF</a></p>
+                <?php endif; ?>
             </div>
         </div>
 
@@ -166,14 +182,10 @@ $conn->close();
             <button type="submit" class="btn btn-success">Simpan</button>
         </div>
     </form>
-
-   
   </div>
 
-  <!-- Bootstrap JS and dependencies -->
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
-
 </html>
