@@ -48,7 +48,7 @@ if (isset($_GET['id'])) {
         // Menangani upload file baru
         $filePath = $row['upload_surat']; // File path lama
         if (isset($_FILES['uploadSurat']) && $_FILES['uploadSurat']['error'] === UPLOAD_ERR_OK) {
-            $uploadDir = 'uploads/'; // Folder tempat menyimpan file
+            $uploadDir = '../uploads/'; // Folder tempat menyimpan file
             $fileName = time() . "_" . basename($_FILES['uploadSurat']['name']);
             $newFilePath = $uploadDir . $fileName;
 
