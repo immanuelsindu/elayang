@@ -198,7 +198,10 @@ $conn->close();
             <label for="uploadSurat" class="col-sm-3 col-form-label">Upload PDF</label>
             <div class="col-sm-9">
                 <input type="file" class="form-control" id="uploadSurat" name="uploadSurat" accept="application/pdf" />
-                <small class="text-muted">Hanya file PDF dengan ukuran maksimal 2 MB.</small>
+                <?php if ($row['upload_surat']): ?>
+                    <p><a href="<?php echo $row['upload_surat']; ?>" target="_blank">Lihat PDF</a></p>
+                <?php endif; ?>
+                <!-- <small class="text-muted">Hanya file PDF dengan ukuran maksimal 2 MB.</small> -->
             </div>
         </div>
         <div class="d-flex justify-content-between">

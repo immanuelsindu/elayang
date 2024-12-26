@@ -195,7 +195,10 @@ $conn->close();
                 </div>
                 <div class="col-md-6 mb-3">
                     <label for="upload-pdf">Upload PDF (Kosongkan jika tidak ada perubahan)</label>
-                    <input type="file" class="form-control" id="upload-pdf" name="upload_pdf" />
+                    <input type="file" class="form-control" id="upload-pdf" name="upload_pdf"   />
+                    <?php if ($row['upload_surat']): ?>
+                        <p><a href="../uploads/<?php echo $row['upload_surat']; ?>" target="_blank">Lihat PDF</a></p>
+                    <?php endif; ?>
                 </div>
             </div>
 
