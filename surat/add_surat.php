@@ -66,51 +66,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   $stmt->close();
   $conn->close();
 }
-
-
-// if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-//     // Ambil data dari form
-//     $kodeSurat = $_POST['kodeSurat'];
-//     $tanggalSurat = $_POST['tanggalSurat'];
-//     $nomorSurat = $_POST['nomorSurat'];
-//     $asalSurat = $_POST['asalSurat'];
-//     $perihal = $_POST['perihal'];
-    
-//     // Proses upload file PDF
-//     if (isset($_FILES['uploadSurat']) && $_FILES['uploadSurat']['error'] == 0) {
-//         $fileTmpName = $_FILES['uploadSurat']['tmp_name'];
-//         $fileData = file_get_contents($fileTmpName); // Membaca file sebagai data binary
-//     } else {
-//         $fileData = null; // Tidak ada file yang diupload
-//     }
-
-//     // Menyimpan data ke dalam database
-//     $sql = "INSERT INTO surat_masuk (kode_surat, tanggal_surat, nomor_surat, asal_surat, perihal, upload_surat) 
-//             VALUES (?, ?, ?, ?, ?, ?)";
-    
-//     // Persiapkan statement untuk menghindari SQL injection
-//     $stmt = $conn->prepare($sql);
-    
-//     // Bind parameter: 'sssssb' untuk 5 string dan 1 binary
-//     $stmt->bind_param("sssssb", $kodeSurat, $tanggalSurat, $nomorSurat, $asalSurat, $perihal, $fileData);
-    
-//     if ($stmt->execute()) {
-//         $message = "Data berhasil disimpan."; // Pesan sukses
-//     } else {
-//         $message = "Error: " . $stmt->error; // Pesan error
-//     }
-
-//     // Menutup statement dan koneksi
-//     $stmt->close();
-//     $conn->close();
-// }
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-<meta charset="utf-8" />
+  <meta charset="utf-8" />
   <meta content="width=device-width, initial-scale=1.0" name="viewport" />
   <title>Admin Dashboard</title>
   <!-- Add Bootstrap CSS -->

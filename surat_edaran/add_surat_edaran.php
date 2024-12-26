@@ -1,63 +1,56 @@
 <?php
 // Memulai session dan koneksi ke database
-
-session_start(); // Mulai session
+session_start();
 
 // Periksa apakah user sudah login
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
-    // Jika belum login, redirect ke halaman login
     header("Location: login.php");
     exit;
 }
 
 // Cek jika tombol logout ditekan
 if (isset($_POST['logout'])) {
-  // Hapus session dan logout
-  session_destroy();
-  header("Location: login.php");
-  exit;
+    session_destroy();
+    header("Location: login.php");
+    exit;
 }
 
 include('../db_connection.php');
 
+// Pesan untuk feedback pengguna
+$message = "";
+
 // Memproses form jika tombol submit ditekan
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Mengambil nilai input dari form
     $kode_surat = $_POST['kode_surat'];
     $tanggal = $_POST['tanggal'];
     $nomor_surat = $_POST['nomor_surat'];
     $perihal = $_POST['perihal'];
     $kepada = $_POST['kepada'];
-    $upload_surat = $_FILES['upload_surat']['tmp_name'];
 
-    // Mengambil file PDF yang diupload
-    if (is_uploaded_file($upload_surat)) {
-        $upload_surat_blob = file_get_contents($upload_surat);
+    // Validasi dan proses file PDF
+    $upload_dir = "../uploads/";
+    $upload_file = $upload_dir . basename($_FILES['upload_surat']['name']);
+    $file_type = strtolower(pathinfo($upload_file, PATHINFO_EXTENSION));
+
+    if ($file_type !== "pdf") {
+        $message = "Hanya file PDF yang diperbolehkan.";
+    } elseif (move_uploaded_file($_FILES["upload_surat"]["tmp_name"], $upload_file)) {
+        // Simpan path file di database
+        $sql = "INSERT INTO surat_edaran (kode_surat, tanggal, nomor_surat, perihal, kepada, upload_surat)
+                VALUES (?, ?, ?, ?, ?, ?)";
+        if ($stmt = $conn->prepare($sql)) {
+            $stmt->bind_param("ssssss", $kode_surat, $tanggal, $nomor_surat, $perihal, $kepada, $upload_file);
+            if ($stmt->execute()) {
+                $message = "Data berhasil disimpan.";
+            } else {
+                $message = "Error: " . htmlspecialchars($stmt->error);
+            }
+            $stmt->close();
+        }
     } else {
-        $upload_surat_blob = null; // Menangani jika tidak ada file yang diupload
+        $message = "Gagal mengupload file.";
     }
-
-    // Query untuk memasukkan data ke tabel surat_edaran
-    $sql = "INSERT INTO surat_edaran (kode_surat, tanggal, nomor_surat, perihal, kepada, upload_surat)
-            VALUES (?, ?, ?, ?, ?, ?)";
-
-    // Menyiapkan statement untuk query
-    if ($stmt = $conn->prepare($sql)) {
-        $stmt->bind_param("sssssb", $kode_surat, $tanggal, $nomor_surat, $perihal, $kepada, $upload_surat_blob);
-
-        // Mengeksekusi statement
-         // Eksekusi query
-         if ($stmt->execute()) {
-              $message = "Data berhasil disimpan."; // Pesan sukses
-          } else {
-              $message = "Error: " . $stmt->error; // Pesan error
-          }
-
-        // Menutup statement
-        $stmt->close();
-    }
-
-    // Menutup koneksi
     $conn->close();
 }
 ?>
@@ -154,11 +147,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
               </div>
           </div>
           <div class="form-group row mb-3">
-              <label for="uploadPdf" class="col-sm-3 col-form-label">Upload PDF</label>
-              <div class="col-sm-9">
-                  <input type="file" class="form-control" id="uploadPdf" name="upload_surat" placeholder="Pilih File PDF" required />
-              </div>
-          </div>
+                <label for="uploadPdf" class="col-sm-3 col-form-label">Upload PDF</label>
+                <div class="col-sm-9">
+                    <input type="file" class="form-control" id="uploadPdf" name="upload_surat" required />
+                </div>
+            </div>
 
           <div class="d-flex justify-content-between">
               <a href="read_disposisi.php" class="btn btn-danger">Batal</a>

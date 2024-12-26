@@ -108,13 +108,7 @@ $result = $conn->query($sql);
                 echo "<td>" . $row['nomor_surat'] . "</td>";
                 echo "<td>" . $row['perihal'] . "</td>";
                 echo "<td>" . $row['kepada'] . "</td>";
-                
-                // Menampilkan file PDF jika ada
-                if ($row['upload_surat']) {
-                    echo "<td><a href='data:application/pdf;base64," . base64_encode($row['upload_surat']) . "' target='_blank'>Lihat PDF</a></td>";
-                } else {
-                    echo "<td>Tidak ada file</td>";
-                }
+                echo "<td><a href='view_pdf.php?id={$row['id']}' class='btn btn-primary btn-sm'>Lihat Surat</a></td>";
 
                 // Kolom Aksi (Edit dan Hapus)
                 echo "<td>";

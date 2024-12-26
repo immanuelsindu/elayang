@@ -92,7 +92,7 @@ $result = $conn->query($sql);
                     <th>Nomor Surat</th>
                     <th>Kepada</th>
                     <th>File Surat</th>
-                    <th>Aksi</th> <!-- Kolom Aksi -->
+                    <th>Aksi</th> 
                 </tr>
             </thead>
             <tbody>
@@ -106,7 +106,7 @@ $result = $conn->query($sql);
                         echo "<td>" . $row['perihal'] . "</td>";
                         echo "<td>" . $row['nomor_surat'] . "</td>";
                         echo "<td>" . $row['kepada'] . "</td>";
-                        echo "<td><a href='download.php?id=" . $row['id'] . "' class='btn btn-info'>Download</a></td>";
+                        echo "<td><a href='view_pdf.php?id={$row['id']}' class='btn btn-primary btn-sm'>Lihat Surat</a></td>";
                         
                         // Kolom Aksi - Edit dan Hapus
                         echo "<td>";

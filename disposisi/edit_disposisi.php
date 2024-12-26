@@ -53,43 +53,58 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
 
 // Proses update data jika form disubmit
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Ambil data dari form
-    $kode_surat = $_POST['kode_surat'];
-    $tanggal = $_POST['tanggal'];
-    $perihal = $_POST['perihal'];
-    $nomor_surat = $_POST['nomor_surat'];
-    $kepada = $_POST['kepada'];
-    $upload_pdf = $_FILES['upload_pdf']['name'];
+  // Ambil data dari form
+  $kode_surat = $_POST['kode_surat'];
+  $tanggal = $_POST['tanggal'];
+  $perihal = $_POST['perihal'];
+  $nomor_surat = $_POST['nomor_surat'];
+  $kepada = $_POST['kepada'];
+  $upload_pdf = $_FILES['upload_pdf']['name'];
+  $target_file = $row['upload_surat']; // Default ke file lama
 
-    // Jika ada file baru yang di-upload, simpan file tersebut
-    if ($upload_pdf) {
-        $target_dir = "uploads/";
-        $target_file = $target_dir . basename($upload_pdf);
-        move_uploaded_file($_FILES["upload_pdf"]["tmp_name"], $target_file);
-    } else {
-        $target_file = $row['upload_surat']; // Jika tidak ada file baru, gunakan file yang lama
-    }
+  // Jika ada file baru yang di-upload
+  if ($upload_pdf) {
+      $target_dir = "../uploads/";
+      $target_file = $target_dir . basename($upload_pdf);
 
-    // Buat query untuk update data disposisi
-    $update_sql = "UPDATE disposisi SET kode_surat = ?, tanggal = ?, perihal = ?, nomor_surat = ?, kepada = ?, upload_surat = ? WHERE id = ?";
+      // Validasi ukuran dan jenis file
+      $file_type = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+      if ($file_type != "pdf") {
+          echo "Hanya file PDF yang diperbolehkan.";
+          exit;
+      }
 
-    if ($stmt = $conn->prepare($update_sql)) {
-        // Bind parameter
-        $stmt->bind_param("ssssssi", $kode_surat, $tanggal, $perihal, $nomor_surat, $kepada, $target_file, $id);
+      if ($_FILES["upload_pdf"]["size"] > 5000000) { // Batas ukuran 5MB
+          echo "File terlalu besar.";
+          exit;
+      }
 
-        // Eksekusi query
-        if ($stmt->execute()) {
-            // Jika berhasil, alihkan ke halaman daftar disposisi
-            header("Location: read_disposisi.php"); // Ganti dengan halaman daftar disposisi Anda
-            exit;
-        } else {
-            echo "Error: " . $stmt->error;
-        }
+      // Pindahkan file baru ke folder tujuan
+      if (move_uploaded_file($_FILES["upload_pdf"]["tmp_name"], $target_file)) {
+          // Hapus file lama jika file baru berhasil diunggah
+          if ($row['upload_surat'] && file_exists($row['upload_surat'])) {
+              unlink($row['upload_surat']);
+          }
+      } else {
+          echo "Terjadi kesalahan saat mengunggah file.";
+          exit;
+      }
+  }
 
-        // Tutup statement
-        $stmt->close();
-    }
+  // Query untuk update data disposisi
+  $update_sql = "UPDATE disposisi SET kode_surat = ?, tanggal = ?, perihal = ?, nomor_surat = ?, kepada = ?, upload_surat = ? WHERE id = ?";
+  if ($stmt = $conn->prepare($update_sql)) {
+      $stmt->bind_param("ssssssi", $kode_surat, $tanggal, $perihal, $nomor_surat, $kepada, $target_file, $id);
+      if ($stmt->execute()) {
+          header("Location: read_disposisi.php");
+          exit;
+      } else {
+          echo "Error: " . $stmt->error;
+      }
+      $stmt->close();
+  }
 }
+
 
 // Tutup koneksi database
 $conn->close();

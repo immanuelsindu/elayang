@@ -1,37 +1,27 @@
 <?php
-// Memulai session dan koneksi ke database
-session_start(); // Mulai session
+session_start();
 
-// Periksa apakah user sudah login
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
-    // Jika belum login, redirect ke halaman login
     header("Location: login.php");
     exit;
 }
 
-// Cek jika tombol logout ditekan
 if (isset($_POST['logout'])) {
-  // Hapus session dan logout
-  session_destroy();
-  header("Location: login.php");
-  exit;
+    session_destroy();
+    header("Location: login.php");
+    exit;
 }
 
 include('../db_connection.php');
 
-// Memastikan ID Surat Edaran ada di URL
 if (isset($_GET['id'])) {
-    // Mengambil ID dari parameter URL
     $id = $_GET['id'];
-
-    // Mengambil data surat edaran yang akan diedit
     $sql = "SELECT * FROM surat_edaran WHERE id = ?";
     if ($stmt = $conn->prepare($sql)) {
         $stmt->bind_param("i", $id);
         $stmt->execute();
         $result = $stmt->get_result();
 
-        // Jika data ditemukan, masukkan ke variabel
         if ($result->num_rows > 0) {
             $data = $result->fetch_assoc();
         } else {
@@ -43,49 +33,64 @@ if (isset($_GET['id'])) {
     }
 }
 
-// Menangani form submit untuk edit data
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Mengambil data dari form
     $kode_surat = $_POST['kode_surat'];
     $tanggal = $_POST['tanggal'];
     $nomor_surat = $_POST['nomor_surat'];
     $perihal = $_POST['perihal'];
     $kepada = $_POST['kepada'];
-    $upload_surat = $_FILES['upload_surat']['tmp_name'];
 
-    // Menyiapkan query untuk update data surat edaran
-    $sql_update = "UPDATE surat_edaran SET kode_surat = ?, tanggal = ?, nomor_surat = ?, perihal = ?, kepada = ?";
+    $upload_surat = $_FILES['upload_surat'];
+    $file_path = null;
 
-    // Jika file PDF diupload, maka lakukan update untuk file
-    if (!empty($upload_surat)) {
-        // Membaca file dan menyimpannya dalam variabel
-        $upload_data = file_get_contents($upload_surat);
-        $sql_update .= ", upload_surat = ?";
+    if ($upload_surat['error'] == UPLOAD_ERR_OK) {
+      $target_dir = "../uploads/";
+      $target_file = $target_dir . basename($upload_surat['name']);
+      $file_type = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+  
+      if ($file_type != "pdf") {
+          echo "Hanya file PDF yang diperbolehkan.";
+          exit;
+      }
+  
+      if ($upload_surat["size"] > 5000000) {
+          echo "File terlalu besar.";
+          exit;
+      }
+  
+      if (move_uploaded_file($upload_surat["tmp_name"], $target_file)) {
+          $file_path = $target_file;
+      } else {
+          echo "Terjadi kesalahan saat mengunggah file.";
+          exit;
+      }
+  }
+  
+    $update_sql = "UPDATE surat_edaran SET kode_surat = ?, tanggal = ?, nomor_surat = ?, perihal = ?, kepada = ?";
+    if ($file_path) {
+        $update_sql .= ", upload_surat = ?";
     }
+    $update_sql .= " WHERE id = ?";
 
-    // Menambahkan bagian query untuk pembaruan data surat edaran
-    $sql_update .= " WHERE id = ?";
-    
-    if ($stmt_update = $conn->prepare($sql_update)) {
-        if (!empty($upload_surat)) {
-            $stmt_update->bind_param("ssssssi", $kode_surat, $tanggal, $nomor_surat, $perihal, $kepada, $upload_data, $id);
+    if ($stmt = $conn->prepare($update_sql)) {
+        if ($file_path) {
+            $stmt->bind_param("ssssssi", $kode_surat, $tanggal, $nomor_surat, $perihal, $kepada, $file_path, $id);
         } else {
-            $stmt_update->bind_param("sssssi", $kode_surat, $tanggal, $nomor_surat, $perihal, $kepada, $id);
+            $stmt->bind_param("sssssi", $kode_surat, $tanggal, $nomor_surat, $perihal, $kepada, $id);
         }
 
-        // Menjalankan query update
-        if ($stmt_update->execute()) {
+        if ($stmt->execute()) {
             $_SESSION['message'] = "Data surat edaran berhasil diperbarui.";
             $_SESSION['msg_type'] = "success";
             header("Location: read_surat_edaran.php");
+            exit;
         } else {
-            $_SESSION['message'] = "Gagal memperbarui data surat edaran.";
-            $_SESSION['msg_type'] = "danger";
+            echo "Error: " . $stmt->error;
         }
+        $stmt->close();
     }
 }
 
-// Menutup koneksi database
 $conn->close();
 ?>
 

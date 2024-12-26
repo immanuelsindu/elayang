@@ -93,7 +93,7 @@ $result = $conn->query($sql);
             <th>Asal Surat</th>
             <th>Perihal</th>
             <th>File Surat</th>
-            <th>Aksi</th> <!-- Kolom baru untuk aksi Edit dan Hapus -->
+            <th>Aksi</th> 
           </tr>
         </thead>
         <tbody>
