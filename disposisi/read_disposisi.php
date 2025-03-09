@@ -80,9 +80,15 @@ $result = $conn->query($sql);
                     Disposisi
                 </p>
 
-                <a href="add_disposisi.php" class="btn btn-success">
+                <div>
+                    <a href="../dashboard.php" class="btn btn-primary">
+                        Kembali ke Beranda
+                    </a>
+                    
+                    <a href="add_disposisi.php" class="btn btn-success">
                     Tambah Disposisi
                 </a>
+                </div>
             </div>
         </div>
 

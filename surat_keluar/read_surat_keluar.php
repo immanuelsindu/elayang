@@ -90,9 +90,15 @@ if (isset($_GET['delete_id'])) {
           Surat Keluar
         </p>
 
-        <a href="add_surat_keluar.php" class="btn btn-success">
-          Tambah Surat Keluar
-        </a>
+        <div>
+          <a href="../dashboard.php" class="btn btn-primary">
+            Kembali ke Beranda
+          </a>
+        
+          <a href="add_surat_keluar.php" class="btn btn-success">
+            Tambah Surat Keluar
+          </a>
+        </div>
       </div>
     </div>
 

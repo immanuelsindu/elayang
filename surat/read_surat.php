@@ -83,9 +83,15 @@ $result = $conn->query($sql);
           Surat Masuk
         </p>
 
-        <a href="add_surat.php" class="btn btn-success">
-          Tambah Surat
-        </a>
+        <div>
+          <a href="../dashboard.php" class="btn btn-primary">
+            Kembali ke Beranda
+          </a>
+          <a href="add_surat.php" class="btn btn-success">
+            Tambah Surat
+          </a>
+        </div>
+        
       </div>
     </div>
     <div class="mt-4">

@@ -81,9 +81,15 @@ $result = $conn->query($sql);
           Surat Edaran
         </p>
 
-        <a href="add_surat_edaran.php" class="btn btn-success">
-          Tambah Surat Edaran
-        </a>
+        <div>
+          <a href="../dashboard.php" class="btn btn-primary">
+            Kembali ke Beranda
+          </a>
+        
+          <a href="add_surat_edaran.php" class="btn btn-success">
+            Tambah Surat Edaran
+          </a>
+        </div>
       </div>
     </div>
 

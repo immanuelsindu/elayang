@@ -70,7 +70,7 @@ $conn->close();
 
         <div class="mt-5 bg-white p-5 rounded-lg shadow-lg w-100 max-w-md mx-auto">
             <h3 class="h4 font-weight-bold text-primary">MASUK</h3>
-            <h5 class="mb-5">Siswa</h5>
+            <h5 class="mb-5"> Sebagai Siswa</h5>
             <p class="text-muted mb-4">Silahkan masuk untuk mulai menggunakan aplikasi</p>
 
             <form action="" method="POST">
