@@ -60,7 +60,7 @@ if (isset($_POST['logout'])) {
 
             <div>
               <span class="text-capitalize">
-              <?php echo $_SESSION['role']; ?>
+                <?php echo $_SESSION['role']; ?>
               </span>
             </div>
            </div>
@@ -82,7 +82,8 @@ if (isset($_POST['logout'])) {
         Anda login sebagai Admin. Anda memiliki akses penuh terhadap sistem
       </p>
     </div>
-    <div class="row row-cols-2 g-4 bg-success p-4">
+
+    <!-- <div class="row row-cols-2 g-4 bg-success p-4">
       <a href="surat/read_surat.php" class="col">
         <div class="bg-primary p-4 d-flex align-items-center rounded">
           <img alt="Surat Masuk Icon" class="me-2" height="50"
@@ -115,17 +116,6 @@ if (isset($_POST['logout'])) {
         </div>
       </a>
 
-      <!-- <a href="download_surat.php" class="col">
-        <div class="bg-primary p-4 d-flex align-items-center rounded">
-          <img alt="Download Surat Icon" class="me-2" height="50"
-            src="https://w7.pngwing.com/pngs/309/298/png-transparent-paper-letterhead-design-angle-triangle-logo.png"
-            width="50" />
-          <span class="text-white">
-            DOWNLOAD SURAT
-          </span>
-        </div>
-      </a> -->
-
       <a href="surat_keluar/read_surat_keluar.php" class="col-6">
         <div class="bg-danger p-4 d-flex align-items-center rounded">
           <img alt="Surat Keluar Icon" class="me-2" height="50"
@@ -135,7 +125,51 @@ if (isset($_POST['logout'])) {
           </span>
         </div>
       </a>
-    </div>
+    </div> -->
+
+    <div class="row row-cols-2 g-4 bg-success p-4">
+      <?php if ($_SESSION['role'] === 'admin' || $_SESSION['role'] === 'staff'): ?>
+          <a href="surat/read_surat.php" class="col">
+              <div class="bg-primary p-4 d-flex align-items-center rounded">
+                  <img alt="Surat Masuk Icon" class="me-2" height="50"
+                      src="https://tse3.mm.bing.net/th?id=OIP.YU1vRLM2Q90Yfl32SN7kDQHaHa&pid=Api&P=0&h=180" width="50" />
+                  <span class="text-white">SURAT MASUK</span>
+              </div>
+          </a>
+      <?php endif; ?>
+
+      <?php if ($_SESSION['role'] === 'admin' || $_SESSION['role'] === 'kasek'): ?>
+          <a href="disposisi/read_disposisi.php" class="col">
+              <div class="bg-warning p-4 d-flex align-items-center rounded">
+                  <img alt="Disposisi Icon" class="me-2" height="50"
+                      src="https://e7.pngegg.com/pngimages/176/67/png-clipart-person-logo-people-travel-text-rectangle.png"
+                      width="50" />
+                  <span class="text-dark">DISPOSISI</span>
+              </div>
+          </a>
+      <?php endif; ?>
+
+      <?php if ($_SESSION['role'] === 'admin' || $_SESSION['role'] === 'staff' || $_SESSION['role'] === 'siswa'): ?>
+          <a href="surat_edaran/read_surat_edaran.php" class="col">
+              <div class="bg-warning p-4 d-flex align-items-center rounded">
+                  <img alt="Surat Edaran Icon" class="me-2" height="50"
+                      src="https://png.pngtree.com/png-vector/20220624/ourlarge/pngtree-mail-logo-fast-png-image_5360233.png"
+                      width="50" />
+                  <span class="text-dark">SURAT EDARAN</span>
+              </div>
+          </a>
+      <?php endif; ?>
+
+      <?php if ($_SESSION['role'] === 'admin' || $_SESSION['role'] === 'staff'): ?>
+          <a href="surat_keluar/read_surat_keluar.php" class="col-6">
+              <div class="bg-danger p-4 d-flex align-items-center rounded">
+                  <img alt="Surat Keluar Icon" class="me-2" height="50"
+                      src="https://bapasjaksel.com/smile/wp-content/uploads/2021/03/Surat-Keluar-1-1024x1024.png" width="50" />
+                  <span class="text-white">SURAT KELUAR</span>
+              </div>
+          </a>
+      <?php endif; ?>
+      </div>
   </div>
 
   <!-- Add Bootstrap JS -->
