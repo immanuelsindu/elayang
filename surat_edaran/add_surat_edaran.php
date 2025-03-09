@@ -72,7 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </script>
 </head>
 <body class="d-flex justify-content-center align-items-center min-vh-100">
-    <div class="p-4 rounded-lg shadow-lg w-100" style="max-width: 900px;">
+    <div class="p-4 rounded-lg shadow-lg w-100" style="max-width: 1200px;">
       <div class="d-flex justify-content-between align-items-center mb-4">
       <a href="../dashboard.php" class="text-decoration-none text-dark">
       <div class="d-flex align-items-center">
@@ -97,9 +97,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 width="50" />
             
             <!-- Username -->
-            <span class="me-3">
-                <?php echo $_SESSION['nama']; ?>
-            </span>
+            <div class="d-flex flex-column me-3">
+                <div>
+                    <b>
+                    <?php echo $_SESSION['nama']; ?>
+                    </b>
+                </div>
+
+                <div>
+                    <span>
+                    <?php echo $_SESSION['role']; ?>
+                    </span>
+                </div>
+            </div>
             
           <!-- Logout Button dengan Tooltip -->
           <form method="POST" class="mb-0">

@@ -112,7 +112,7 @@ $conn->close();
 </head>
 
 <body class="bg-light d-flex justify-content-center align-items-center min-vh-100">
-  <div class="bg-white p-4 rounded shadow w-100" style="max-width: 768px;">
+  <div class="bg-white p-4 rounded shadow w-100" style="max-width: 1200px;">
     <div class="d-flex justify-content-between align-items-center mb-4">
     <a href="../dashboard.php" class="text-decoration-none text-dark">
       <div class="d-flex align-items-center">
@@ -137,9 +137,19 @@ $conn->close();
               width="50" />
           
           <!-- Username -->
-          <span class="me-3">
-              <?php echo $_SESSION['nama']; ?>
-          </span>
+            <div class="d-flex flex-column me-3">
+                <div>
+                    <b>
+                    <?php echo $_SESSION['nama']; ?>
+                    </b>
+                </div>
+
+                <div>
+                    <span>
+                    <?php echo $_SESSION['role']; ?>
+                    </span>
+                </div>
+            </div>
           
          <!-- Logout Button dengan Tooltip -->
         <form method="POST" class="mb-0">

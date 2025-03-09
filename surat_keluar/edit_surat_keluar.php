@@ -110,7 +110,7 @@ $conn->close();
 </head>
 
 <body class="d-flex justify-content-center align-items-center min-vh-100">
-  <div class="bg-white p-5 rounded-lg shadow-lg w-100" style="max-width: 900px;">
+  <div class="bg-white p-5 rounded-lg shadow-lg w-100" style="max-width: 1200px;">
   <div class="d-flex justify-content-between align-items-center mb-4">
   <a href="../dashboard.php" class="text-decoration-none text-dark">
       <div class="d-flex align-items-center">
@@ -132,7 +132,23 @@ $conn->close();
           <img alt="User Avatar" class="rounded-circle me-2" height="50"
               src="https://static.vecteezy.com/system/resources/previews/000/439/863/original/vector-users-icon.jpg"
               width="50" />
-          <span class="me-3"><?php echo $_SESSION['nama']; ?></span>
+
+
+            <div class="d-flex flex-column me-3">
+                <div>
+                    <b>
+                    <?php echo $_SESSION['nama']; ?>
+                    </b>
+                </div>
+
+                <div>
+                    <span>
+                        <?php echo $_SESSION['role']; ?>
+                    </span>
+                </div>
+           </div>
+
+
         <form method="POST" class="mb-0">
             <button type="submit" name="logout" class="btn btn-danger" data-bs-toggle="tooltip" title="Logout">
                 <i class="fas fa-sign-out-alt"></i>
