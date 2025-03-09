@@ -7,6 +7,12 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     exit;
 }
 
+  if (!in_array($_SESSION['role'], ['admin', 'staff'])) {
+    header("Location: ../dashboard.php");
+    exit;
+  }
+
+
 // Koneksi ke database
 include('../db_connection.php');
 

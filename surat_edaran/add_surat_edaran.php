@@ -4,9 +4,14 @@ session_start();
 
 // Periksa apakah user sudah login
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
-        header("Location: ../login.php");
+    header("Location: ../login.php");
     exit;
 }
+
+if (!in_array($_SESSION['role'], ['admin', 'staff'])) {
+    header("Location: ../dashboard.php");
+    exit;
+  }
 
 // Cek jika tombol logout ditekan
 if (isset($_POST['logout'])) {

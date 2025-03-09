@@ -9,6 +9,12 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     exit;
 }
 
+// pengguna yang bukan admin/kasek akan di pindah ke dashboard
+if (!in_array($_SESSION['role'], ['admin', 'kasek'])) {
+    header("Location: ../dashboard.php");
+    exit;
+  }
+
 // Cek jika tombol logout ditekan
 if (isset($_POST['logout'])) {
     // Hapus session dan logout

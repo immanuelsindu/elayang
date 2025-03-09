@@ -1,6 +1,14 @@
 <?php
 // Koneksi ke database
+session_start(); // Mulai session
 include('../db_connection.php');
+
+// Periksa apakah user sudah login
+if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+    // Jika belum login, redirect ke halaman login
+    header("Location: login.php");
+    exit;
+}
 
 // Cek apakah parameter 'id' ada di URL
 if (isset($_GET['id'])) {

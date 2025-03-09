@@ -3,6 +3,13 @@
 session_start();
 include('../db_connection.php');
 
+// Periksa apakah user sudah login
+if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+    // Jika belum login, redirect ke halaman login
+    header("Location: login.php");
+    exit;
+}
+
 // Memeriksa apakah parameter ID ada di URL
 if (isset($_GET['id'])) {
     // Mengambil ID dari parameter URL

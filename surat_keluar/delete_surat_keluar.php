@@ -1,15 +1,14 @@
 <?php
-// Koneksi ke database
-$servername = "localhost"; // Ganti dengan host database Anda
-$username = "root"; // Ganti dengan username database Anda
-$password = ""; // Ganti dengan password database Anda
-$dbname = "elayang"; // Ganti dengan nama database Anda
 
-$conn = new mysqli($servername, $username, $password, $dbname);
+session_start(); // Mulai session
+include('../db_connection.php');
 
-// Check koneksi
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+
+// Periksa apakah user sudah login
+if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+    // Jika belum login, redirect ke halaman login
+    header("Location: ../login.php");
+    exit;
 }
 
 // Periksa apakah ada id yang dikirimkan

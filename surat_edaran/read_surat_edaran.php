@@ -10,6 +10,12 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     exit;
 }
 
+// pengguna yang bukan siswa/admin/staff akan di pindah ke dashboard
+if (!in_array($_SESSION['role'], ['siswa', 'admin', 'staff'])) {
+  header("Location: ../dashboard.php");
+  exit;
+}
+
 // Cek jika tombol logout ditekan
 if (isset($_POST['logout'])) {
   // Hapus session dan logout
@@ -96,52 +102,95 @@ $result = $conn->query($sql);
             Kembali ke Beranda
           </a>
         
-          <a href="add_surat_edaran.php" class="btn btn-success">
-            Tambah Surat Edaran
-          </a>
+          <?php if ($_SESSION['role'] !== 'siswa'): ?>
+            <a  href="add_surat_edaran.php" class="btn btn-success">
+              Tambah Surat Edaran
+            </a>
+          <?php endif; ?>
         </div>
       </div>
     </div>
 
-    <table class="table table-bordered">
-      <thead class="table-light">
-        <tr>
-          <th>Kode Surat</th>
-          <th>Tanggal Surat</th>
-          <th>Nomor Surat</th>
-          <th>Perihal</th>
-          <th>Kepada</th>
-          <th>File Surat</th>
-          <th>Aksi</th>
-        </tr>
-      </thead>
-      <tbody>
-        <?php
-        // Mengecek apakah ada data dalam tabel
-        if ($result->num_rows > 0) {
-            // Output data dari setiap baris
-            while($row = $result->fetch_assoc()) {
-                echo "<tr>";
-                echo "<td>" . $row['kode_surat'] . "</td>";
-                echo "<td>" . $row['tanggal'] . "</td>";
-                echo "<td>" . $row['nomor_surat'] . "</td>";
-                echo "<td>" . $row['perihal'] . "</td>";
-                echo "<td>" . $row['kepada'] . "</td>";
-                echo "<td><a href='view_pdf.php?id={$row['id']}' class='btn btn-primary btn-sm'>Lihat Surat</a></td>";
 
-                // Kolom Aksi (Edit dan Hapus)
-                echo "<td>";
-                echo "<a href='edit_surat_edaran.php?id=" . $row['id'] . "' class='btn btn-warning btn-sm'>Edit</a> ";
-                echo "<a href='delete_surat_edaran.php?id=" . $row['id'] . "' class='btn btn-danger btn-sm' onclick='return confirm(\"Yakin ingin menghapus data?\")'>Hapus</a>";
-                echo "</td>";
-                echo "</tr>";
-            }
-        } else {
-            echo "<tr><td colspan='7'>Tidak ada data</td></tr>";
-        }
-        ?>
-      </tbody>
-    </table>
+    <!-- jika role bukan siswa -->
+    <?php if ($_SESSION['role'] !== 'siswa'): ?>
+      <table class="table table-bordered">
+        <thead class="table-light">
+          <tr>
+            <th>Kode Surat</th>
+            <th>Tanggal Surat</th>
+            <th>Nomor Surat</th>
+            <th>Perihal</th>
+            <th>Kepada</th>
+            <th>File Surat</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          <?php
+          // Mengecek apakah ada data dalam tabel
+          if ($result->num_rows > 0) {
+              // Output data dari setiap baris
+              while($row = $result->fetch_assoc()) {
+                  echo "<tr>";
+                  echo "<td>" . $row['kode_surat'] . "</td>";
+                  echo "<td>" . $row['tanggal'] . "</td>";
+                  echo "<td>" . $row['nomor_surat'] . "</td>";
+                  echo "<td>" . $row['perihal'] . "</td>";
+                  echo "<td>" . $row['kepada'] . "</td>";
+                  echo "<td><a href='view_pdf.php?id={$row['id']}' class='btn btn-primary btn-sm'>Lihat Surat</a></td>";
+
+                  // Kolom Aksi (Edit dan Hapus)
+                  echo "<td>";
+                  echo "<a href='edit_surat_edaran.php?id=" . $row['id'] . "' class='btn btn-warning btn-sm'>Edit</a> ";
+                  echo "<a href='delete_surat_edaran.php?id=" . $row['id'] . "' class='btn btn-danger btn-sm' onclick='return confirm(\"Yakin ingin menghapus data?\")'>Hapus</a>";
+                  echo "</td>";
+                  echo "</tr>";
+              }
+          } else {
+              echo "<tr><td colspan='7'>Tidak ada data</td></tr>";
+          }
+          ?>
+        </tbody>
+      </table>
+    <?php endif; ?>
+
+
+
+    <!-- jika role siswa -->
+    <?php if ($_SESSION['role'] === 'siswa'): ?>
+      <table class="table table-bordered">
+        <thead class="table-light">
+          <tr>
+            <th>Kode Surat</th>
+            <th>Tanggal Surat</th>
+            <th>Nomor Surat</th>
+            <th>Perihal</th>
+            <th>Kepada</th>
+            <th>File Surat</th>
+          </tr>
+        </thead>
+        <tbody>
+          <?php
+          // Mengecek apakah ada data dalam tabel
+          if ($result->num_rows > 0) {
+              // Output data dari setiap baris
+              while($row = $result->fetch_assoc()) {
+                  echo "<tr>";
+                  echo "<td>" . $row['kode_surat'] . "</td>";
+                  echo "<td>" . $row['tanggal'] . "</td>";
+                  echo "<td>" . $row['nomor_surat'] . "</td>";
+                  echo "<td>" . $row['perihal'] . "</td>";
+                  echo "<td>" . $row['kepada'] . "</td>";
+                  echo "<td><a href='view_pdf.php?id={$row['id']}' class='btn btn-primary btn-sm'>Lihat Surat</a></td>";
+              }
+          } else {
+              echo "<tr><td colspan='7'>Tidak ada data</td></tr>";
+          }
+          ?>
+        </tbody>
+      </table>
+    <?php endif; ?>
   </div>
 
   <!-- Add Bootstrap JS -->
