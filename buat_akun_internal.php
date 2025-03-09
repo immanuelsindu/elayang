@@ -69,9 +69,9 @@ $conn->close();
         </div>
 
         <div class="mt-5 bg-white p-5 rounded-lg shadow-lg w-100 max-w-md mx-auto">
-            <h3 class="h4 font-weight-bold text-primary ">MASUK</h3>
-            <h5 class="mb-5"> Admin, Staff, atau Kasek</h5>
-            <p class="text-muted mb-4">Silahkan masuk untuk mulai menggunakan aplikasi</p>
+            <h3 class="h4 font-weight-bold text-primary">BUAT AKUN</h3>
+            <h5 class="mb-5">Admin, Staff, atau Kasek</h5>
+            <!-- <p class="text-muted mb-4">Silahkan masuk untuk mulai menggunakan aplikasi</p> -->
 
             <form action="" method="POST">
                 <div class="form-group mb-4">
@@ -86,11 +86,11 @@ $conn->close();
           
 
             <div class="mt-5 text-center">
-                <a class="text-primary" href="login_siswa.php">Masuk Sebagai Siswa</a>
+                <a class="text-primary" href="login.php">Masuk Sebagai Admin, Staff, atau Kasek.</a>
             </div>
 
             <div class="mt-3 text-center">
-                <p class="text-muted">Tidak memiliki akun ? <a class="text-primary" href="buat_akun_internal.php">Buat akun baru!</a></p>
+                <p class="text-muted">Tidak memiliki akun ? <a class="text-primary" href="#">Buat akun baru!</a></p>
             </div>
 
         </div>

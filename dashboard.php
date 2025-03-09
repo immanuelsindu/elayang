@@ -51,10 +51,20 @@ if (isset($_POST['logout'])) {
               width="50" />
           
           <!-- Username -->
-          <span class="me-3">
-              <?php echo $_SESSION['nama']; ?>
-          </span>
-          
+           <div class="d-flex flex-column me-3">
+            <div>
+                <b>
+                <?php echo $_SESSION['nama']; ?>
+                </b>
+            </div>
+
+            <div>
+              <span>
+              <?php echo $_SESSION['role']; ?>
+              </span>
+            </div>
+           </div>
+         
          <!-- Logout Button dengan Tooltip -->
         <form method="POST" class="mb-0">
             <button type="submit" name="logout" class="btn btn-danger" data-bs-toggle="tooltip" title="Logout">
