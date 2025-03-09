@@ -161,7 +161,7 @@ $conn->close();
             </div>
 
             <div>
-              <span>
+            <span class="text-capitalize">
               <?php echo $_SESSION['role']; ?>
               </span>
             </div>

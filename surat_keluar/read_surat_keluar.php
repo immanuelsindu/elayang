@@ -79,8 +79,8 @@ if (isset($_GET['delete_id'])) {
             </div>
 
             <div>
-              <span>
-              <?php echo $_SESSION['role']; ?>
+              <span class="text-capitalize">
+                <?php echo $_SESSION['role']; ?>
               </span>
             </div>
            </div>

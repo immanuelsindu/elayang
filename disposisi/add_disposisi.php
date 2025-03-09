@@ -126,7 +126,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
 
             <div>
-              <span>
+            <span class="text-capitalize">
               <?php echo $_SESSION['role']; ?>
               </span>
             </div>
