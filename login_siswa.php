@@ -86,7 +86,7 @@ $conn->close();
           
 
             <div class="mt-5 text-center">
-                <a class="text-primary" href="login.php">Masuk Sebagai Admin, Staff, atau Kasek.</a>
+                <a class="text-primary" href="login.php">Masuk Sebagai Admin, Staff, atau Kepala Sekolah.</a>
             </div>
 
             <div class="mt-3 text-center">

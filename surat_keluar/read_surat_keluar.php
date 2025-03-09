@@ -4,7 +4,7 @@ session_start(); // Mulai session
 // Periksa apakah user sudah login
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     // Jika belum login, redirect ke halaman login
-    header("Location: login.php");
+        header("Location: ../login.php");
     exit;
 }
 
@@ -12,7 +12,7 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 if (isset($_POST['logout'])) {
   // Hapus session dan logout
   session_destroy();
-  header("Location: login.php");
+      header("Location: ../login.php");
   exit;
 }
 

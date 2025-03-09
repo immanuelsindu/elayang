@@ -93,14 +93,9 @@ $conn->close();
             <?php if (isset($message)) { echo '<p class="text-danger mt-3">'.$message.'</p>'; } ?>
           
 
-            <div class="mt-5 text-center">
-                <a class="text-primary" href="login.php">Masuk Sebagai Admin, Staff, atau Kasek.</a>
-            </div>
-
             <div class="mt-3 text-center">
-                <p class="text-muted">Tidak memiliki akun ? <a class="text-primary" href="buat_akun_siswa.php">Buat akun baru!</a></p>
+                <p class="text-muted">Sudah memiliki akun ? <a class="text-primary" href="login_siswa.php">Masuk sekarang!</a></p>
             </div>
-
         </div>
     </div>
 </body>

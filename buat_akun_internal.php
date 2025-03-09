@@ -1,52 +1,48 @@
 <?php
-session_start(); // Mulai session
-
-// Koneksi ke database
+session_start();
 include('db_connection.php');
 
-// Periksa jika form login disubmit
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Ambil username dan password yang dimasukkan
-    $username = $_POST['username'];
-    $password = $_POST['password'];
+    $nama     = trim($_POST['nama']);
+    $username = trim($_POST['username']);
+    $password = trim($_POST['password']);
+    $confirm_password = trim($_POST['confirm_password']);
+    $role     = trim($_POST['role']);
 
-    // Query untuk mengambil data berdasarkan username
-    $sql = "SELECT * FROM users WHERE username = ?";
-    if ($stmt = $conn->prepare($sql)) {
+    // Validasi input
+    if (empty($nama) || empty($username) || empty($password) || empty($confirm_password) || empty($role)) {
+        echo "<script>alert('Semua kolom harus diisi!'); window.location.href='buat_akun_internal.php';</script>";
+    } elseif ($password !== $confirm_password) {
+        echo "<script>alert('Konfirmasi password tidak cocok!'); window.location.href='buat_akun_internal.php';</script>";
+    } else {
+        // Cek apakah username sudah digunakan
+        $sql_check = "SELECT id FROM users WHERE username = ?";
+        $stmt = $conn->prepare($sql_check);
         $stmt->bind_param("s", $username);
         $stmt->execute();
-        $result = $stmt->get_result();
+        $stmt->store_result();
 
-        // Jika user ditemukan
-        if ($result->num_rows > 0) {
-            $row = $result->fetch_assoc();
-
-            // Periksa password langsung (tanpa hash)
-            if ($password == $row['password']) {
-                // Set session login
-                $_SESSION['loggedin'] = true;
-                $_SESSION['username'] = $username;
-                $_SESSION['nama'] = $row['nama']; // Menyimpan nama pengguna dalam session
-                $_SESSION['role'] = $row['role']; // Menyimpan nama pengguna dalam session
-
-                // Login sukses, redirect ke dashboard
-                header("Location: dashboard.php");
-                exit;
-            } else {
-                // Password salah
-                $message = "Password salah!";
-            }
+        if ($stmt->num_rows > 0) {
+            echo "<script>alert('Username sudah terdaftar! Gunakan username lain.'); window.location.href='buat_akun_internal.php';</script>";
         } else {
-            // Username tidak ditemukan
-            $message = "Username tidak ditemukan!";
-        }
 
+            // Simpan data ke database
+            $sql_insert = "INSERT INTO users (nama, username, password, role) VALUES (?, ?, ?, ?)";
+            $stmt = $conn->prepare($sql_insert);
+            $stmt->bind_param("ssss", $nama, $username, $password, $role);
+
+            if ($stmt->execute()) {
+                echo "<script>alert('Akun berhasil dibuat! Silakan login.'); window.location.href='login.php';</script>";
+            } else {
+                echo "<script>alert('Terjadi kesalahan saat membuat akun.'); window.location.href='buat_akun_internal.php';</script>";
+            }
+        }
         $stmt->close();
     }
+    $conn->close();
 }
-
-$conn->close();
 ?>
+
 
 
 <!DOCTYPE html>
@@ -70,29 +66,39 @@ $conn->close();
 
         <div class="mt-5 bg-white p-5 rounded-lg shadow-lg w-100 max-w-md mx-auto">
             <h3 class="h4 font-weight-bold text-primary">BUAT AKUN</h3>
-            <h5 class="mb-5">Admin, Staff, atau Kasek</h5>
+            <h5 class="mb-5">Sebagai Admin, Staff, atau Kepala Sekolah</h5>
             <!-- <p class="text-muted mb-4">Silahkan masuk untuk mulai menggunakan aplikasi</p> -->
 
             <form action="" method="POST">
+                <div class="form-group mb-4">
+                    <input class="form-control" placeholder="Masukkan nama lengkap" type="text" name="nama" required />
+                </div>
                 <div class="form-group mb-4">
                     <input class="form-control" placeholder="Username" type="text" name="username" required />
                 </div>
                 <div class="form-group mb-4">
                     <input class="form-control" placeholder="Password" type="password" name="password" required />
                 </div>
-                <button class="btn btn-primary w-100 py-2 font-weight-bold" type="submit">LOGIN</button>
+                <div class="form-group mb-4">
+                    <input class="form-control" placeholder="Konfirmasi Password" type="password" name="confirm_password" required />
+                </div>
+                <div class="form-group mb-4">
+                    <select class="form-control" name="role" required>
+                        <option value="" disabled selected>Pilih Role</option>
+                        <option value="admin">Admin</option>
+                        <option value="kasek">Kepala Sekolah</option>
+                        <option value="staff">Staff</option>
+                    </select>
+                </div>
+
+                <button class="btn btn-primary w-100 py-2 font-weight-bold" type="submit">BUAT AKUN</button>
             </form>
             <?php if (isset($message)) { echo '<p class="text-danger mt-3">'.$message.'</p>'; } ?>
           
 
-            <div class="mt-5 text-center">
-                <a class="text-primary" href="login.php">Masuk Sebagai Admin, Staff, atau Kasek.</a>
-            </div>
-
             <div class="mt-3 text-center">
-                <p class="text-muted">Tidak memiliki akun ? <a class="text-primary" href="#">Buat akun baru!</a></p>
+                <p class="text-muted">Sudah memiliki akun ? <a class="text-primary" href="login.php">Masuk sekarang!</a></p>
             </div>
-
         </div>
     </div>
 </body>

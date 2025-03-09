@@ -3,7 +3,7 @@ session_start(); // Mulai session
 
 // Periksa apakah user sudah login
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
-    header("Location: login.php");
+    header("Location: ../login.php");
     exit;
 }
 
